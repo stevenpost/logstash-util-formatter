@@ -87,7 +87,7 @@ public class LogstashUtilFormatter extends Formatter {
     }
 
     /**
-     * Enocde all addtional fields.
+     * Encode all additional fields.
      *
      * @param record the log record
      * @return objectBuilder
@@ -104,7 +104,7 @@ public class LogstashUtilFormatter extends Formatter {
     }
 
     /**
-     * Format the stackstrace.
+     * Format the stacktrace.
      *
      * @param record the logrecord which contains the stacktrace
      * @param builder the json object builder to append
