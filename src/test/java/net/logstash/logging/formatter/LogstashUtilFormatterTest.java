@@ -51,6 +51,7 @@ public class LogstashUtilFormatterTest {
 
     static {
         System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
         try {
             hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
@@ -101,6 +102,8 @@ public class LogstashUtilFormatterTest {
         fieldsBuilder.add("exception_class", ex.getClass().getName());
         fieldsBuilder.add("exception_message", ex.getMessage());
         fieldsBuilder.add("stacktrace", EXPECTED_EX_STACKTRACE);
+        fieldsBuilder.add("foo", "bar");
+        fieldsBuilder.add("baz", "foobar");
 
         builder.add("@fields", fieldsBuilder);
 

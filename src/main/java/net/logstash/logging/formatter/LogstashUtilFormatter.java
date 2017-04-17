@@ -39,6 +39,8 @@ public class LogstashUtilFormatter extends Formatter {
     private static String hostName;
     private static final String[] tags = System.getProperty(
             "net.logstash.logging.formatter.LogstashUtilFormatter.tags", "UNKNOWN").split(",");
+    private static final String[] customfields = System.getProperty(
+            "net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "").split(",");
 
     static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ";
 
@@ -97,9 +99,16 @@ public class LogstashUtilFormatter extends Formatter {
         builder.add("timestamp", record.getMillis());
         builder.add("level", record.getLevel().toString());
         builder.add("line_number", getLineNumber(record));
+
         addSourceClassName(record, builder);
         addSourceMethodName(record, builder);
         addThrowableInfo(record, builder);
+        for (final String customfield : customfields) {
+            final String field[] = customfield.split(":");
+            final String key = field[0];
+            final String value = field[1];
+            builder.add(key, value);
+        }
         return builder;
     }
 

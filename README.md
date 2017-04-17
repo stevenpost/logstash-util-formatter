@@ -73,3 +73,6 @@ input {
 ```
 * By setting the system propery `net.logstash.logging.formatter.LogstashUtilFormatter.tags` you may easily add tags,
 which let you differentiate between multiple instances running on the same host.
+
+* By setting the system property `net.logstash.logging.formatter.LogstashUtilFormatter.customfields`you may easily add extra fields,
+the format is `key1:value1,key2:value2`
