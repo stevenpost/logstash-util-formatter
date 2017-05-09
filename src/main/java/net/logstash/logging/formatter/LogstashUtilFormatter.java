@@ -29,10 +29,13 @@ import javax.json.JsonArrayBuilder;
 import javax.json.JsonBuilderFactory;
 import javax.json.JsonObjectBuilder;
 
+import org.jboss.logmanager.ExtFormatter;
+import org.jboss.logmanager.ExtLogRecord;
+
 /**
  *
  */
-public class LogstashUtilFormatter extends Formatter {
+public class LogstashUtilFormatter extends ExtFormatter {
 
     private static final JsonBuilderFactory BUILDER =
             Json.createBuilderFactory(null);
@@ -53,7 +56,7 @@ public class LogstashUtilFormatter extends Formatter {
     }
 
     @Override
-    public final String format(final LogRecord record) {
+    public final String format(final ExtLogRecord record) {
         final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         final String dateString = dateFormat.format(new Date(record.getMillis()));
         final JsonArrayBuilder tagsBuilder = BUILDER.createArrayBuilder();
