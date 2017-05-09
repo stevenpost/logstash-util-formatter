@@ -104,10 +104,12 @@ public class LogstashUtilFormatter extends Formatter {
         addSourceMethodName(record, builder);
         addThrowableInfo(record, builder);
         for (final String customfield : customfields) {
-            final String field[] = customfield.split(":");
-            final String key = field[0];
-            final String value = field[1];
-            builder.add(key, value);
+        	if (!"".equals(customfield)) {
+	            final String field[] = customfield.split(":");
+	            final String key = field[0];
+	            final String value = field[1];
+	            builder.add(key, value);
+        	}
         }
         return builder;
     }
