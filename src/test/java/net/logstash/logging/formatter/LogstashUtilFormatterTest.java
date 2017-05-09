@@ -28,6 +28,7 @@ import javax.json.JsonObjectBuilder;
 
 import static org.junit.Assert.*;
 
+import org.jboss.logmanager.ExtLogRecord;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,10 +48,11 @@ public class LogstashUtilFormatterTest {
     private Exception ex = buildException("That is an exception", cause,
             new StackTraceElement("Test", "methodTest", "Test.class", 42));
 
-    private LogRecord record = null;
+    private ExtLogRecord record = null;
     private String fullLogMessage = null;
     private String logMessageWithoutcustomFields = null;
     private static String hostName;
+    private static final String MESSAGE = "Junit Test";
     private JsonObjectBuilder fieldsBuilderWithCustomFields;
 
     static {
@@ -75,10 +77,11 @@ public class LogstashUtilFormatterTest {
     public void setUp() {
 
         long millis = System.currentTimeMillis();
-        record = new LogRecord(Level.ALL, "Junit Test");
+        record = new ExtLogRecord(Level.ALL, MESSAGE, LogstashUtilFormatterTest.class.getName());
         record.setLoggerName(LogstashUtilFormatter.class.getName());
         record.setSourceClassName(LogstashUtilFormatter.class.getName());
         record.setSourceMethodName("testMethod");
+        record.setThreadName("Main Thread");
         record.setMillis(millis);
         record.setThrown(ex);
 
@@ -126,7 +129,7 @@ public class LogstashUtilFormatterTest {
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(LogstashUtilFormatter.DATE_FORMAT);
         String dateString = dateFormat.format(new Date(millis));
         builder.add("@timestamp", dateString);
-        builder.add("message", "Junit Test");
+        builder.add("message", MESSAGE);
         builder.add("source", LogstashUtilFormatter.class.getName());
         builder.add("source_host", hostName);
 	}
@@ -137,6 +140,7 @@ public class LogstashUtilFormatterTest {
         fieldsBuilder.add("line_number", ex.getStackTrace()[0].getLineNumber());
         fieldsBuilder.add("class", LogstashUtilFormatter.class.getName());
         fieldsBuilder.add("method", "testMethod");
+        fieldsBuilder.add("thread_name", "Main Thread");
         fieldsBuilder.add("exception_class", ex.getClass().getName());
         fieldsBuilder.add("exception_message", ex.getMessage());
         fieldsBuilder.add("stacktrace", EXPECTED_EX_STACKTRACE);

@@ -97,7 +97,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
      * @param record the log record
      * @return objectBuilder
      */
-    final JsonObjectBuilder encodeFields(final LogRecord record) {
+    final JsonObjectBuilder encodeFields(final ExtLogRecord record) {
         JsonObjectBuilder builder = BUILDER.createObjectBuilder();
         builder.add("timestamp", record.getMillis());
         builder.add("level", record.getLevel().toString());
@@ -105,6 +105,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
 
         addSourceClassName(record, builder);
         addSourceMethodName(record, builder);
+        addSourceThreadName(record, builder);
         addThrowableInfo(record, builder);
         for (final String customfield : customfields) {
         	if (!"".equals(customfield)) {
@@ -117,7 +118,11 @@ public class LogstashUtilFormatter extends ExtFormatter {
         return builder;
     }
 
-    /**
+    private void addSourceThreadName(ExtLogRecord record, JsonObjectBuilder builder) {
+    	addValue(builder, "thread_name", record.getThreadName());
+	}
+
+	/**
      * Format the stacktrace.
      *
      * @param record the logrecord which contains the stacktrace
