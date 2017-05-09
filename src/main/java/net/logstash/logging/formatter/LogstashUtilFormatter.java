@@ -67,9 +67,9 @@ public class LogstashUtilFormatter extends ExtFormatter {
         return BUILDER
                 .createObjectBuilder()
                 .add("@timestamp", dateString)
-                .add("@message", formatMessage(record))
-                .add("@source", record.getLoggerName())
-                .add("@source_host", hostName)
+                .add("message", formatMessage(record))
+                .add("source", record.getLoggerName())
+                .add("source_host", hostName)
                 .add("@fields", encodeFields(record))
                 .add("@tags", tagsBuilder.build())
                 .build()

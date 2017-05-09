@@ -126,9 +126,9 @@ public class LogstashUtilFormatterTest {
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(LogstashUtilFormatter.DATE_FORMAT);
         String dateString = dateFormat.format(new Date(millis));
         builder.add("@timestamp", dateString);
-        builder.add("@message", "Junit Test");
-        builder.add("@source", LogstashUtilFormatter.class.getName());
-        builder.add("@source_host", hostName);
+        builder.add("message", "Junit Test");
+        builder.add("source", LogstashUtilFormatter.class.getName());
+        builder.add("source_host", hostName);
 	}
 
 	private void addCommonFields(long millis, JsonObjectBuilder fieldsBuilder) {
