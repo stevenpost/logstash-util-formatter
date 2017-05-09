@@ -37,9 +37,9 @@ public class LogstashUtilFormatter extends Formatter {
     private static final JsonBuilderFactory BUILDER =
             Json.createBuilderFactory(null);
     private static String hostName;
-    private static final String[] tags = System.getProperty(
+    private final String[] tags = System.getProperty(
             "net.logstash.logging.formatter.LogstashUtilFormatter.tags", "UNKNOWN").split(",");
-    private static final String[] customfields = System.getProperty(
+    private final String[] customfields = System.getProperty(
             "net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "").split(",");
 
     static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ";
