@@ -1,29 +1,60 @@
-# Java Util Logging JSON encoder for Logstash
+# JBoss logmanager JSON encoder for Logstash
 
-## Include as a dependency
+## Compatibility
+This library has been verified and tested using JBoss EAP 7.0,
+but is likely to work with later versions as well as WildFly.
 
-First, add it to your project as a dependency.
+It does *not* work on JBoss EAP 6.x.
 
-Maven style:
+## Include as a module
+
+First, add it as a module to your JBoss EAP installation.
 
 ```xml
-<dependency>
-  <groupId>net.logstash.logging</groupId>
-  <artifactId>logstash-util-formatter</artifactId>
-  <version>1.0</version>
-</dependency>
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.1" name="net.logstash">
+  <resources>
+      <resource-root path="logstash-util-formatter-1.1-SNAPSHOT.jar" />
+  </resources>
+  <dependencies>
+      <module name="javax.json.api"/>
+      <module name="org.jboss.logmanager"/>
+  </dependencies>
+</module>
 ```
 
-Use it in your `logging.properties` like this:
+Add a formatter and appender like this:
+
+```xml
+<periodic-rotating-file-handler name="LOGSTASH_FILE" autoflush="true">
+  <level name="INFO"/>
+  <formatter>
+    <named-formatter name="LOGSTASH_PATTERN"/>
+  </formatter>
+  <file relative-to="jboss.server.log.dir" path="logstash.log"/>
+  <suffix value=".yyyy-MM-dd"/>
+  <append value="true"/>
+</periodic-rotating-file-handler>
 
 ```
-handlers=java.util.logging.ConsoleHandler
-java.util.logging.ConsoleHandler.formatter=net.logstash.logging.formatter.LogstashUtilFormatter
-
+```xml
+<formatter name="LOGSTASH_PATTERN">
+  <custom-formatter
+    class="net.logstash.logging.formatter.LogstashUtilFormatter"
+    module="net.logstash"/>
+</formatter>
 ```
+Then you can add the appender to your logger(s) like this:
+<root-logger>
+  <level name="INFO"/>
+    <handlers>
+      <handler name="CONSOLE"/>
+      <handler name="FILE"/>
+      <handler name="LOGSTASH_FILE"/>
+    </handlers>
+</root-logger>
 
 Use it in your logstash configuration like this:
-
 ```
 input {
   file {
@@ -34,45 +65,16 @@ input {
 }
 ```
 
-## Example usage in Jenkins on Debian
+## Custom fields and tags
 
-* Create a directory in `JENKINS_HOME`: `mkdir /var/lib/jenkins/lib`
-* Copy the shaded jar to this directory.
-* Create a `logging.properties` in `/var/lib/jenkins/lib`:
-
-```
-handlers= java.util.logging.ConsoleHandler,java.util.logging.FileHandler
-.level= INFO
-
-java.util.logging.FileHandler.level = INFO
-java.util.logging.FileHandler.formatter = net.logstash.logging.formatter.LogstashUtilFormatter
-java.util.logging.FileHandler.pattern = /var/log/jenkins/logstash.log
-java.util.logging.FileHandler.limit = 5000000
-java.util.logging.FileHandler.count = 1
-
-java.util.logging.ConsoleHandler.level = INFO
-java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
-```
-* Extend `JAVA_ARGS` in `/etc/default/jenkins`:
-
-```
-JAVA_ARGS="$JAVA_ARGS -Djava.endorsed.dirs=$JENKINS_HOME/lib -Djava.util.logging.config.file=$JENKINS_HOME/lib/logging.properties"
-JAVA_ARGS="$JAVA_ARGS -Dnet.logstash.logging.formatter.LogstashUtilFormatter.tags=master,mailer"
-```
-
-* Use it in your logstash configuration like this:
-
-```
-input {
-  file {
-    type => "jenkins-server"
-    path => "/var/log/jenkins/logstash.log"
-    format => "json_event"
-  }
-}
-```
-* By setting the system propery `net.logstash.logging.formatter.LogstashUtilFormatter.tags` you may easily add tags,
+* By setting the system property `net.logstash.logging.formatter.LogstashUtilFormatter.tags` you may easily add tags,
 which let you differentiate between multiple instances running on the same host.
 
 * By setting the system property `net.logstash.logging.formatter.LogstashUtilFormatter.customfields`you may easily add extra fields,
 the format is `key1:value1,key2:value2`
+
+## Looking for a non-JBoss specific formatter?
+This library is based on https://github.com/SYNAXON/logstash-util-formatter,
+it has been extended to allow custom fields and get more information from JBoss logging, such as thread names.
+The cost of these additions however, is that it became dependent on JBoss EAP/WildFly.
+The 'upstream' source uses java.util.logging directly.
