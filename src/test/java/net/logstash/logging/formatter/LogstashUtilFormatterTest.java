@@ -84,6 +84,7 @@ public class LogstashUtilFormatterTest {
         record.setThreadName("Main Thread");
         record.setMillis(millis);
         record.setThrown(ex);
+        record.setNdc("ndc_test");
 
         fullLogMessage = createFullMessage(millis);
         logMessageWithoutFields = createMessageWithoutFields(millis);
@@ -144,6 +145,7 @@ public class LogstashUtilFormatterTest {
         fieldsBuilder.add("exception_class", ex.getClass().getName());
         fieldsBuilder.add("exception_message", ex.getMessage());
         fieldsBuilder.add("stacktrace", EXPECTED_EX_STACKTRACE);
+        fieldsBuilder.add("ndc", "ndc_test");
 	}
 
     @Test

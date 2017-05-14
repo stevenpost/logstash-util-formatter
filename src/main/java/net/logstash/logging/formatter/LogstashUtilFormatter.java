@@ -106,6 +106,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
         addSourceMethodName(record, builder);
         addSourceThreadName(record, builder);
         addThrowableInfo(record, builder);
+        addNdc(record, builder);
         for (final String customfield : customfields) {
         	if (!"".equals(customfield)) {
 	            final String field[] = customfield.split(":");
@@ -116,6 +117,12 @@ public class LogstashUtilFormatter extends ExtFormatter {
         }
         return builder;
     }
+
+	private void addNdc(final ExtLogRecord record, JsonObjectBuilder builder) {
+		if (record.getNdc() != null) {
+			builder.add("ndc", record.getNdc());
+		}
+	}
 
     private void addSourceThreadName(ExtLogRecord record, JsonObjectBuilder builder) {
     	addValue(builder, "thread_name", record.getThreadName());
