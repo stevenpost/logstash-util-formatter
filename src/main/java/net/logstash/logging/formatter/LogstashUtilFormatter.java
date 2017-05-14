@@ -29,6 +29,7 @@ import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonBuilderFactory;
 import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
 
 import org.jboss.logmanager.ExtFormatter;
 import org.jboss.logmanager.ExtLogRecord;
@@ -72,12 +73,24 @@ public class LogstashUtilFormatter extends ExtFormatter {
                 .add("source", record.getLoggerName())
                 .add("source_host", hostName)
                 .add("@fields", encodeFields(record))
+                .add("@mdc", encodeMdc(record))
                 .add("@tags", tagsBuilder.build())
                 .build()
                 .toString() + "\n";
     }
 
-    @Override
+    private JsonValue encodeMdc(ExtLogRecord record) {
+    	JsonObjectBuilder builder = BUILDER.createObjectBuilder();
+
+        Map<String, String> mdc = record.getMdcCopy();
+		for (Entry<String, String> entry : mdc.entrySet()) {
+			builder.add(entry.getKey(), entry.getValue());
+		}
+
+        return builder.build();
+	}
+
+	@Override
     public synchronized String formatMessage(final LogRecord record) {
         String message = super.formatMessage(record);
 
@@ -109,7 +122,6 @@ public class LogstashUtilFormatter extends ExtFormatter {
         addSourceThreadName(record, builder);
         addThrowableInfo(record, builder);
         addNdc(record, builder);
-        addMdc(record, builder);
         for (final String customfield : customfields) {
         	if (!"".equals(customfield)) {
 	            final String field[] = customfield.split(":");

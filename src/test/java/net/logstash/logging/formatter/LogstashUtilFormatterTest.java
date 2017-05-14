@@ -107,6 +107,9 @@ public class LogstashUtilFormatterTest {
 
         builder.add("@fields", fieldsBuilderWithFields);
 
+        JsonObjectBuilder mdcFieldsBuilder = createMdcFields();
+        builder.add("@mdc", mdcFieldsBuilder);
+
         JsonArrayBuilder tagsBuilder = Json.createArrayBuilder();
         tagsBuilder.add("foo");
         tagsBuilder.add("bar");
@@ -124,12 +127,24 @@ public class LogstashUtilFormatterTest {
 
         builder.add("@fields", fieldsBuilder);
 
+        JsonObjectBuilder mdcFieldsBuilder = createMdcFields();
+        builder.add("@mdc", mdcFieldsBuilder);
+
         JsonArrayBuilder tagsBuilder = Json.createArrayBuilder();
         tagsBuilder.add("foo");
         tagsBuilder.add("bar");
         builder.add("@tags", tagsBuilder.build());
 
         return builder.build().toString() + "\n";
+	}
+
+	private JsonObjectBuilder createMdcFields() {
+		JsonObjectBuilder mdcFieldsBuilder = Json.createBuilderFactory(null).createObjectBuilder();
+
+		mdcFieldsBuilder.add("key2", "MDC_value2");
+		mdcFieldsBuilder.add("key1", "MDC_value1");
+
+		return mdcFieldsBuilder;
 	}
 
 	private void addCommonElements(long millis, JsonObjectBuilder builder) {
@@ -152,8 +167,6 @@ public class LogstashUtilFormatterTest {
         fieldsBuilder.add("exception_message", ex.getMessage());
         fieldsBuilder.add("stacktrace", EXPECTED_EX_STACKTRACE);
         fieldsBuilder.add("ndc", "ndc_test");
-        fieldsBuilder.add("MDC_key2", "MDC_value2");
-        fieldsBuilder.add("MDC_key1", "MDC_value1");
 	}
 
     @Test
