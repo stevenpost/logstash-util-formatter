@@ -19,6 +19,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -85,6 +87,10 @@ public class LogstashUtilFormatterTest {
         record.setMillis(millis);
         record.setThrown(ex);
         record.setNdc("ndc_test");
+        Map<String, String> mdcMap = new HashMap<String, String>();
+        mdcMap.put("key1", "MDC_value1");
+        mdcMap.put("key2", "MDC_value2");
+        record.setMdc(mdcMap);
 
         fullLogMessage = createFullMessage(millis);
         logMessageWithoutFields = createMessageWithoutFields(millis);
@@ -146,6 +152,8 @@ public class LogstashUtilFormatterTest {
         fieldsBuilder.add("exception_message", ex.getMessage());
         fieldsBuilder.add("stacktrace", EXPECTED_EX_STACKTRACE);
         fieldsBuilder.add("ndc", "ndc_test");
+        fieldsBuilder.add("MDC_key2", "MDC_value2");
+        fieldsBuilder.add("MDC_key1", "MDC_value1");
 	}
 
     @Test

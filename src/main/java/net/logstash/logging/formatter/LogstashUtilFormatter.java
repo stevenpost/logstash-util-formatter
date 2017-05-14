@@ -21,6 +21,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.LogRecord;
 
 import javax.json.Json;
@@ -107,6 +109,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
         addSourceThreadName(record, builder);
         addThrowableInfo(record, builder);
         addNdc(record, builder);
+        addMdc(record, builder);
         for (final String customfield : customfields) {
         	if (!"".equals(customfield)) {
 	            final String field[] = customfield.split(":");
@@ -117,6 +120,13 @@ public class LogstashUtilFormatter extends ExtFormatter {
         }
         return builder;
     }
+
+	private void addMdc(ExtLogRecord record, JsonObjectBuilder builder) {
+		Map<String, String> mdc = record.getMdcCopy();
+		for (Entry<String, String> entry : mdc.entrySet()) {
+			builder.add("MDC_" + entry.getKey(), entry.getValue());
+		}
+	}
 
 	private void addNdc(final ExtLogRecord record, JsonObjectBuilder builder) {
 		if (record.getNdc() != null) {
