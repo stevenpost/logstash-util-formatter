@@ -18,8 +18,8 @@
 	</licenses>
 
 	<scm>
-		<connection>scm:git:git@github.com:SYNAXON/logstash-util-formatter.git</connection>
-		<developerConnection>scm:git:git@github.com:SYNAXON/logstash-util-formatter.git</developerConnection>
+		<connection>scm:git:git@github.com:stevenpost/logstash-util-formatter.git</connection>
+		<developerConnection>scm:git:git@github.com:stevenpost/logstash-util-formatter.git</developerConnection>
 	</scm>
 
 	<parent>
@@ -37,6 +37,11 @@
 			<id>datenbrille</id>
 			<name>Karl Spies</name>
 			<email>Karl.Spies@synaxon.de</email>
+		</developer>
+		<developer>
+			<id>datenbrille</id>
+			<name>Steven Post</name>
+			<email>redalert.commander@gmail.com</email>
 		</developer>
 	</developers>
 	<properties>
