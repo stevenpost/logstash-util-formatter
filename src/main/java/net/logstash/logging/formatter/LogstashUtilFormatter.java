@@ -21,7 +21,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 import javax.json.Json;
@@ -43,7 +42,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
     private final String[] tags = System.getProperty(
             "net.logstash.logging.formatter.LogstashUtilFormatter.tags", "UNKNOWN").split(",");
     private final String[] customfields = System.getProperty(
-            "net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "").split(",");
+            "net.logstash.logging.formatter.LogstashUtilFormatter.fields", "").split(",");
 
     static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZZ";
 

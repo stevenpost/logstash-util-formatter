@@ -50,10 +50,10 @@ public class LogstashUtilFormatterTest {
 
     private ExtLogRecord record = null;
     private String fullLogMessage = null;
-    private String logMessageWithoutcustomFields = null;
+    private String logMessageWithoutFields = null;
     private static String hostName;
     private static final String MESSAGE = "Junit Test";
-    private JsonObjectBuilder fieldsBuilderWithCustomFields;
+    private JsonObjectBuilder fieldsBuilderWithFields;
 
     static {
         try {
@@ -86,19 +86,19 @@ public class LogstashUtilFormatterTest {
         record.setThrown(ex);
 
         fullLogMessage = createFullMessage(millis);
-        logMessageWithoutcustomFields = createMessageWithoutCustomFields(millis);
+        logMessageWithoutFields = createMessageWithoutFields(millis);
     }
 
 	private String createFullMessage(long millis) {
 		JsonObjectBuilder builder = Json.createBuilderFactory(null).createObjectBuilder();
         addCommonElements(millis, builder);
 
-        fieldsBuilderWithCustomFields = Json.createBuilderFactory(null).createObjectBuilder();
-        addCommonFields(millis, fieldsBuilderWithCustomFields);
-        fieldsBuilderWithCustomFields.add("foo", "bar");
-        fieldsBuilderWithCustomFields.add("baz", "foobar");
+        fieldsBuilderWithFields = Json.createBuilderFactory(null).createObjectBuilder();
+        addCommonFields(millis, fieldsBuilderWithFields);
+        fieldsBuilderWithFields.add("foo", "bar");
+        fieldsBuilderWithFields.add("baz", "foobar");
 
-        builder.add("@fields", fieldsBuilderWithCustomFields);
+        builder.add("@fields", fieldsBuilderWithFields);
 
         JsonArrayBuilder tagsBuilder = Json.createArrayBuilder();
         tagsBuilder.add("foo");
@@ -108,7 +108,7 @@ public class LogstashUtilFormatterTest {
         return builder.build().toString() + "\n";
 	}
 
-	private String createMessageWithoutCustomFields(long millis) {
+	private String createMessageWithoutFields(long millis) {
 		JsonObjectBuilder builder = Json.createBuilderFactory(null).createObjectBuilder();
         addCommonElements(millis, builder);
 
@@ -149,11 +149,11 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatWithEmptyFields() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "");
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
 
         String result = instance.format(record);
-        assertEquals(logMessageWithoutcustomFields, result);
+        assertEquals(logMessageWithoutFields, result);
     }
 
     /**
@@ -162,7 +162,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormat() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
 
         String result = instance.format(record);
@@ -175,11 +175,11 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testEncodeFields() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
     	LogstashUtilFormatter instance = new LogstashUtilFormatter();
 
         JsonObjectBuilder result = instance.encodeFields(record);
-        assertEquals(fieldsBuilderWithCustomFields.build().toString(), result.build().toString());
+        assertEquals(fieldsBuilderWithFields.build().toString(), result.build().toString());
     }
 
     /**
@@ -188,7 +188,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testAddThrowableInfo() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         final String expected = Json.createBuilderFactory(null).createObjectBuilder()
             .add("exception_class", ex.getClass().getName())
             .add("exception_message", ex.getMessage())
@@ -207,7 +207,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testAddThrowableInfoNoThrowableAttached() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         JsonObjectBuilder result = Json.createBuilderFactory(null).createObjectBuilder();
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
         instance.addThrowableInfo(new LogRecord(Level.OFF, hostName), result);
@@ -220,7 +220,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testAddThrowableInfoThrowableAttachedButWithoutSourceClassName() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         final String expected = Json.createBuilderFactory(null).createObjectBuilder()
                 .add("exception_message", ex.getMessage())
                 .add("stacktrace", EXPECTED_EX_STACKTRACE)
@@ -240,7 +240,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testAddThrowableInfoThrowableAttachedButWithoutMessage() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         final Exception ex2 = buildException(null, null, new StackTraceElement[0]);
         record.setThrown(ex2);
 
@@ -261,7 +261,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testGetLineNumber() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
     	LogstashUtilFormatter instance = new LogstashUtilFormatter();
         int result = instance.getLineNumber(record);
         assertEquals(ex.getStackTrace()[0].getLineNumber(), result);
@@ -273,7 +273,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testGetLineNumberNoThrown() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
     	LogstashUtilFormatter instance = new LogstashUtilFormatter();
         assertEquals(0, instance.getLineNumber(new LogRecord(Level.OFF, "foo")));
     }
@@ -284,7 +284,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testGetLineNumberFromStackTrace() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
     	LogstashUtilFormatter instance = new LogstashUtilFormatter();
         assertEquals(0, instance.getLineNumberFromStackTrace(new StackTraceElement[0]));
         assertEquals(0, instance.getLineNumberFromStackTrace(new StackTraceElement[]{null}));
@@ -296,7 +296,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testAddValue() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         JsonObjectBuilder builder = Json.createBuilderFactory(null).createObjectBuilder();
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
         instance.addValue(builder, "key", "value");
@@ -309,7 +309,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testAddNullValue() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         JsonObjectBuilder builder = Json.createBuilderFactory(null).createObjectBuilder();
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
         instance.addValue(builder, "key", null);
@@ -319,7 +319,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatMessageWithSquigglyFormat() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         record.setMessage("{0} %s");
         record.setParameters(new Object[] { "hi" });
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
@@ -329,7 +329,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatMessageWithSquigglyFormatAndNullParameters() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         record.setMessage("{0}");
         record.setParameters(null);
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
@@ -339,7 +339,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatMessageWithSquigglyFormatAndEmptyParameters() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         record.setMessage("{0}");
         record.setParameters(new Object[0]);
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
@@ -349,7 +349,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatMessageWithBogusSquigglyFormatAndOkPercentFormat() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         // this will fail the squiggly formatting, and fall back to % formatting
         record.setMessage("{0'}' %s");
         record.setParameters(new Object[] { "hi" });
@@ -360,7 +360,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatMessageWithPercentFormat() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         record.setMessage("%s");
         record.setParameters(new Object[] { "hi" });
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
@@ -370,7 +370,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatMessageWithPercentFormatAndNullParameters() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         record.setMessage("%s");
         record.setParameters(null);
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
@@ -380,7 +380,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatMessageWithPercentFormatAndEmptyParameters() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         record.setMessage("%s");
         record.setParameters(new Object[0]);
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
@@ -390,7 +390,7 @@ public class LogstashUtilFormatterTest {
     @Test
     public void testFormatMessageWithBogusPercentFormat() {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.customfields", "foo:bar,baz:foobar");
+        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         record.setMessage("%0.5s");
         record.setParameters(new Object[] { "hi" });
         LogstashUtilFormatter instance = new LogstashUtilFormatter();
