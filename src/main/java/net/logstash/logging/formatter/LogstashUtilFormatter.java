@@ -133,13 +133,6 @@ public class LogstashUtilFormatter extends ExtFormatter {
         return builder;
     }
 
-	private void addMdc(ExtLogRecord record, JsonObjectBuilder builder) {
-		Map<String, String> mdc = record.getMdcCopy();
-		for (Entry<String, String> entry : mdc.entrySet()) {
-			builder.add("MDC_" + entry.getKey(), entry.getValue());
-		}
-	}
-
 	private void addNdc(final ExtLogRecord record, JsonObjectBuilder builder) {
 		if (record.getNdc() != null) {
 			builder.add("ndc", record.getNdc());
