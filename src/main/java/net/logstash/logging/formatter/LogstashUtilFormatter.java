@@ -74,7 +74,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
                 .add("message", formatMessage(record))
                 .add("logger_name", record.getLoggerName())
                 .add("thread_name", record.getThreadName())
-                .add("source_host", hostName)
+                .add("HOSTNAME", hostName)
                 .add("@fields", encodeFields(record))
                 .add("@mdc", encodeMdc(record))
                 .add("@tags", tagsBuilder.build())

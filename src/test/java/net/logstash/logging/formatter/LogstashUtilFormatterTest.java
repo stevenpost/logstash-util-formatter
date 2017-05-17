@@ -156,7 +156,7 @@ public class LogstashUtilFormatterTest {
         builder.add("message", MESSAGE);
         builder.add("logger_name", LogstashUtilFormatter.class.getName());
         builder.add("thread_name", "Main Thread");
-        builder.add("source_host", hostName);
+        builder.add("HOSTNAME", hostName);
 	}
 
 	private void addCommonFields(JsonObjectBuilder fieldsBuilder) {
