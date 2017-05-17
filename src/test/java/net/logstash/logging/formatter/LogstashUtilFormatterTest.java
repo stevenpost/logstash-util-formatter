@@ -101,7 +101,7 @@ public class LogstashUtilFormatterTest {
         addCommonElements(millis, builder);
 
         fieldsBuilderWithFields = Json.createBuilderFactory(null).createObjectBuilder();
-        addCommonFields(millis, fieldsBuilderWithFields);
+        addCommonFields(fieldsBuilderWithFields);
         fieldsBuilderWithFields.add("foo", "bar");
         fieldsBuilderWithFields.add("baz", "foobar");
 
@@ -123,7 +123,7 @@ public class LogstashUtilFormatterTest {
         addCommonElements(millis, builder);
 
         JsonObjectBuilder fieldsBuilder = Json.createBuilderFactory(null).createObjectBuilder();
-        addCommonFields(millis, fieldsBuilder);
+        addCommonFields(fieldsBuilder);
 
         builder.add("@fields", fieldsBuilder);
 
@@ -151,18 +151,18 @@ public class LogstashUtilFormatterTest {
 		final SimpleDateFormat dateFormat = new SimpleDateFormat(LogstashUtilFormatter.DATE_FORMAT);
         String dateString = dateFormat.format(new Date(millis));
         builder.add("@timestamp", dateString);
+        builder.add("level", Level.ALL.toString());
+        builder.add("level_value", Level.ALL.intValue());
         builder.add("message", MESSAGE);
-        builder.add("source", LogstashUtilFormatter.class.getName());
+        builder.add("logger_name", LogstashUtilFormatter.class.getName());
+        builder.add("thread_name", "Main Thread");
         builder.add("source_host", hostName);
 	}
 
-	private void addCommonFields(long millis, JsonObjectBuilder fieldsBuilder) {
-		fieldsBuilder.add("timestamp", millis);
-        fieldsBuilder.add("level", Level.ALL.toString());
+	private void addCommonFields(JsonObjectBuilder fieldsBuilder) {
         fieldsBuilder.add("line_number", ex.getStackTrace()[0].getLineNumber());
         fieldsBuilder.add("class", LogstashUtilFormatter.class.getName());
         fieldsBuilder.add("method", "testMethod");
-        fieldsBuilder.add("thread_name", "Main Thread");
         fieldsBuilder.add("exception_class", ex.getClass().getName());
         fieldsBuilder.add("exception_message", ex.getMessage());
         fieldsBuilder.add("stacktrace", EXPECTED_EX_STACKTRACE);

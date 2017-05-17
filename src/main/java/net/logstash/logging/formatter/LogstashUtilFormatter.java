@@ -69,8 +69,11 @@ public class LogstashUtilFormatter extends ExtFormatter {
         return BUILDER
                 .createObjectBuilder()
                 .add("@timestamp", dateString)
+                .add("level", record.getLevel().toString())
+                .add("level_value", record.getLevel().intValue())
                 .add("message", formatMessage(record))
-                .add("source", record.getLoggerName())
+                .add("logger_name", record.getLoggerName())
+                .add("thread_name", record.getThreadName())
                 .add("source_host", hostName)
                 .add("@fields", encodeFields(record))
                 .add("@mdc", encodeMdc(record))
@@ -113,13 +116,10 @@ public class LogstashUtilFormatter extends ExtFormatter {
      */
     final JsonObjectBuilder encodeFields(final ExtLogRecord record) {
         JsonObjectBuilder builder = BUILDER.createObjectBuilder();
-        builder.add("timestamp", record.getMillis());
-        builder.add("level", record.getLevel().toString());
         builder.add("line_number", getLineNumber(record));
 
         addSourceClassName(record, builder);
         addSourceMethodName(record, builder);
-        addSourceThreadName(record, builder);
         addThrowableInfo(record, builder);
         addNdc(record, builder);
         for (final String customfield : customfields) {
@@ -139,11 +139,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
 		}
 	}
 
-    private void addSourceThreadName(ExtLogRecord record, JsonObjectBuilder builder) {
-    	addValue(builder, "thread_name", record.getThreadName());
-	}
-
-	/**
+    /**
      * Format the stacktrace.
      *
      * @param record the logrecord which contains the stacktrace
