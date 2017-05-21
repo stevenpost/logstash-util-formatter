@@ -74,8 +74,6 @@ public class LogstashUtilFormatter extends ExtFormatter {
                .add("thread_name", record.getThreadName())
                .add("HOSTNAME", hostName);
 
-        builder.add("line_number", getLineNumber(record));
-
         addSourceClassName(record, builder);
         addSourceMethodName(record, builder);
         addThrowableInfo(record, builder);
@@ -139,6 +137,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
      */
     final void addThrowableInfo(final LogRecord record, final JsonObjectBuilder builder) {
         if (record.getThrown() != null) {
+        	builder.add("line_number", getLineNumber(record));
             if (record.getSourceClassName() != null) {
                 builder.add("exception_class",
                         record.getThrown().getClass().getName());

@@ -154,9 +154,9 @@ public class LogstashUtilFormatterTest {
 	}
 
 	private void addCommonFields(JsonObjectBuilder fieldsBuilder) {
-        fieldsBuilder.add("line_number", ex.getStackTrace()[0].getLineNumber());
         fieldsBuilder.add("class", LogstashUtilFormatter.class.getName());
         fieldsBuilder.add("method", "testMethod");
+        fieldsBuilder.add("line_number", ex.getStackTrace()[0].getLineNumber());
         fieldsBuilder.add("exception_class", ex.getClass().getName());
         fieldsBuilder.add("exception_message", ex.getMessage());
         fieldsBuilder.add("stack_trace", EXPECTED_EX_STACKTRACE);
@@ -194,6 +194,7 @@ public class LogstashUtilFormatterTest {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
         System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         final String expected = Json.createBuilderFactory(null).createObjectBuilder()
+        	.add("line_number", ex.getStackTrace()[0].getLineNumber())
             .add("exception_class", ex.getClass().getName())
             .add("exception_message", ex.getMessage())
             .add("stack_trace", EXPECTED_EX_STACKTRACE)
@@ -226,6 +227,7 @@ public class LogstashUtilFormatterTest {
     	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
         System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         final String expected = Json.createBuilderFactory(null).createObjectBuilder()
+        		.add("line_number", ex.getStackTrace()[0].getLineNumber())
                 .add("exception_message", ex.getMessage())
                 .add("stack_trace", EXPECTED_EX_STACKTRACE)
                 .build().toString();
@@ -249,6 +251,7 @@ public class LogstashUtilFormatterTest {
         record.setThrown(ex2);
 
         final String expected = Json.createBuilderFactory(null).createObjectBuilder()
+        		.add("line_number", 0)
                 .add("exception_class", ex2.getClass().getName())
                 .add("stack_trace", "java.lang.Exception\n")
                 .build().toString();
