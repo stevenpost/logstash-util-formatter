@@ -107,13 +107,14 @@ public class LogstashUtilFormatterTest {
 
         builder.add("@fields", fieldsBuilderWithFields);
 
-        JsonObjectBuilder mdcFieldsBuilder = createMdcFields();
-        builder.add("@mdc", mdcFieldsBuilder);
 
         JsonArrayBuilder tagsBuilder = Json.createArrayBuilder();
         tagsBuilder.add("foo");
         tagsBuilder.add("bar");
         builder.add("@tags", tagsBuilder.build());
+
+        JsonObjectBuilder mdcFieldsBuilder = createMdcFields();
+        builder.add("@mdc", mdcFieldsBuilder);
 
         return builder.build().toString() + "\n";
 	}
@@ -127,13 +128,13 @@ public class LogstashUtilFormatterTest {
 
         builder.add("@fields", fieldsBuilder);
 
-        JsonObjectBuilder mdcFieldsBuilder = createMdcFields();
-        builder.add("@mdc", mdcFieldsBuilder);
-
         JsonArrayBuilder tagsBuilder = Json.createArrayBuilder();
         tagsBuilder.add("foo");
         tagsBuilder.add("bar");
         builder.add("@tags", tagsBuilder.build());
+
+        JsonObjectBuilder mdcFieldsBuilder = createMdcFields();
+        builder.add("@mdc", mdcFieldsBuilder);
 
         return builder.build().toString() + "\n";
 	}

@@ -66,31 +66,35 @@ public class LogstashUtilFormatter extends ExtFormatter {
             tagsBuilder.add(tag);
         }
 
-        return BUILDER
-                .createObjectBuilder()
-                .add("@timestamp", dateString)
-                .add("level", record.getLevel().toString())
-                .add("level_value", record.getLevel().intValue())
-                .add("message", formatMessage(record))
-                .add("logger_name", record.getLoggerName())
-                .add("thread_name", record.getThreadName())
-                .add("HOSTNAME", hostName)
-                .add("@fields", encodeFields(record))
-                .add("@mdc", encodeMdc(record))
-                .add("@tags", tagsBuilder.build())
-                .build()
-                .toString() + "\n";
+        JsonObjectBuilder builder = BUILDER.createObjectBuilder();
+
+        builder.add("@timestamp", dateString)
+               .add("level", record.getLevel().toString())
+               .add("level_value", record.getLevel().intValue())
+               .add("message", formatMessage(record))
+               .add("logger_name", record.getLoggerName())
+               .add("thread_name", record.getThreadName())
+               .add("HOSTNAME", hostName)
+               .add("@fields", encodeFields(record))
+               .add("@tags", tagsBuilder.build());
+
+        addMdc(record, builder);
+
+        return builder.build().toString() + "\n";
     }
 
-    private JsonValue encodeMdc(ExtLogRecord record) {
-    	JsonObjectBuilder builder = BUILDER.createObjectBuilder();
+    private void addMdc(ExtLogRecord record, JsonObjectBuilder builder) {
+    	Map<String, String> mdc = record.getMdcCopy();
 
-        Map<String, String> mdc = record.getMdcCopy();
-		for (Entry<String, String> entry : mdc.entrySet()) {
-			builder.add(entry.getKey(), entry.getValue());
-		}
+    	if (!mdc.isEmpty()) {
+	    	JsonObjectBuilder mdcBuilder = BUILDER.createObjectBuilder();
 
-        return builder.build();
+			for (Entry<String, String> entry : mdc.entrySet()) {
+				mdcBuilder.add(entry.getKey(), entry.getValue());
+			}
+
+			builder.add("@mdc", mdcBuilder.build());
+    	}
 	}
 
 	@Override
