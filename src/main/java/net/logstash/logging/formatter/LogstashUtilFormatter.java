@@ -138,7 +138,7 @@ public class LogstashUtilFormatter extends ExtFormatter {
     }
 
 	private void addNdc(final ExtLogRecord record, JsonObjectBuilder builder) {
-		if (record.getNdc() != null) {
+		if (record.getNdc() != null && !"".equals(record.getNdc())) {
 			builder.add("ndc", record.getNdc());
 		}
 	}
