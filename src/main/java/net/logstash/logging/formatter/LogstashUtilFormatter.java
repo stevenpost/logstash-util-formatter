@@ -202,6 +202,6 @@ public class LogstashUtilFormatter extends ExtFormatter {
     private void addStacktraceElements(final LogRecord record, final JsonObjectBuilder builder) {
         final StringWriter sw = new StringWriter();
         record.getThrown().printStackTrace(new PrintWriter(sw));
-        builder.add("stacktrace", sw.toString());
+        builder.add("stack_trace", sw.toString());
     }
 }

@@ -159,7 +159,7 @@ public class LogstashUtilFormatterTest {
         fieldsBuilder.add("method", "testMethod");
         fieldsBuilder.add("exception_class", ex.getClass().getName());
         fieldsBuilder.add("exception_message", ex.getMessage());
-        fieldsBuilder.add("stacktrace", EXPECTED_EX_STACKTRACE);
+        fieldsBuilder.add("stack_trace", EXPECTED_EX_STACKTRACE);
         fieldsBuilder.add("ndc", "ndc_test");
 	}
 
@@ -196,7 +196,7 @@ public class LogstashUtilFormatterTest {
         final String expected = Json.createBuilderFactory(null).createObjectBuilder()
             .add("exception_class", ex.getClass().getName())
             .add("exception_message", ex.getMessage())
-            .add("stacktrace", EXPECTED_EX_STACKTRACE)
+            .add("stack_trace", EXPECTED_EX_STACKTRACE)
             .build().toString();
 
         JsonObjectBuilder result = Json.createBuilderFactory(null).createObjectBuilder();
@@ -227,7 +227,7 @@ public class LogstashUtilFormatterTest {
         System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
         final String expected = Json.createBuilderFactory(null).createObjectBuilder()
                 .add("exception_message", ex.getMessage())
-                .add("stacktrace", EXPECTED_EX_STACKTRACE)
+                .add("stack_trace", EXPECTED_EX_STACKTRACE)
                 .build().toString();
 
         record.setSourceClassName(null);
@@ -250,7 +250,7 @@ public class LogstashUtilFormatterTest {
 
         final String expected = Json.createBuilderFactory(null).createObjectBuilder()
                 .add("exception_class", ex2.getClass().getName())
-                .add("stacktrace", "java.lang.Exception\n")
+                .add("stack_trace", "java.lang.Exception\n")
                 .build().toString();
 
         JsonObjectBuilder result = Json.createBuilderFactory(null).createObjectBuilder();
