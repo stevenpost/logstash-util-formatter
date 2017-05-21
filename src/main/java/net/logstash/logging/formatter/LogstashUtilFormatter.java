@@ -72,9 +72,24 @@ public class LogstashUtilFormatter extends ExtFormatter {
                .add("message", formatMessage(record))
                .add("logger_name", record.getLoggerName())
                .add("thread_name", record.getThreadName())
-               .add("HOSTNAME", hostName)
-               .add("@fields", encodeFields(record))
-               .add("@tags", tagsBuilder.build());
+               .add("HOSTNAME", hostName);
+
+        builder.add("line_number", getLineNumber(record));
+
+        addSourceClassName(record, builder);
+        addSourceMethodName(record, builder);
+        addThrowableInfo(record, builder);
+        addNdc(record, builder);
+        for (final String customfield : customfields) {
+        	if (!"".equals(customfield)) {
+	            final String field[] = customfield.split(":");
+	            final String key = field[0];
+	            final String value = field[1];
+	            builder.add(key, value);
+        	}
+        }
+
+        builder.add("@tags", tagsBuilder.build());
 
         addMdc(record, builder);
 
@@ -108,31 +123,6 @@ public class LogstashUtilFormatter extends ExtFormatter {
         }
 
         return message;
-    }
-
-    /**
-     * Encode all additional fields.
-     *
-     * @param record the log record
-     * @return objectBuilder
-     */
-    final JsonObjectBuilder encodeFields(final ExtLogRecord record) {
-        JsonObjectBuilder builder = BUILDER.createObjectBuilder();
-        builder.add("line_number", getLineNumber(record));
-
-        addSourceClassName(record, builder);
-        addSourceMethodName(record, builder);
-        addThrowableInfo(record, builder);
-        addNdc(record, builder);
-        for (final String customfield : customfields) {
-        	if (!"".equals(customfield)) {
-	            final String field[] = customfield.split(":");
-	            final String key = field[0];
-	            final String value = field[1];
-	            builder.add(key, value);
-        	}
-        }
-        return builder;
     }
 
 	private void addNdc(final ExtLogRecord record, JsonObjectBuilder builder) {

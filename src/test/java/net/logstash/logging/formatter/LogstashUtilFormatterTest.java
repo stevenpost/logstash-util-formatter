@@ -53,9 +53,9 @@ public class LogstashUtilFormatterTest {
     private ExtLogRecord record = null;
     private String fullLogMessage = null;
     private String logMessageWithoutFields = null;
+    private JsonObjectBuilder fieldsBuilderWithFields = null;
     private static String hostName;
     private static final String MESSAGE = "Junit Test";
-    private JsonObjectBuilder fieldsBuilderWithFields;
 
     static {
         try {
@@ -97,36 +97,29 @@ public class LogstashUtilFormatterTest {
     }
 
 	private String createFullMessage(long millis) {
-		JsonObjectBuilder builder = Json.createBuilderFactory(null).createObjectBuilder();
-        addCommonElements(millis, builder);
+		fieldsBuilderWithFields = Json.createBuilderFactory(null).createObjectBuilder();
+        addCommonElements(millis, fieldsBuilderWithFields);
 
-        fieldsBuilderWithFields = Json.createBuilderFactory(null).createObjectBuilder();
         addCommonFields(fieldsBuilderWithFields);
         fieldsBuilderWithFields.add("foo", "bar");
         fieldsBuilderWithFields.add("baz", "foobar");
 
-        builder.add("@fields", fieldsBuilderWithFields);
-
-
         JsonArrayBuilder tagsBuilder = Json.createArrayBuilder();
         tagsBuilder.add("foo");
         tagsBuilder.add("bar");
-        builder.add("@tags", tagsBuilder.build());
+        fieldsBuilderWithFields.add("@tags", tagsBuilder.build());
 
         JsonObjectBuilder mdcFieldsBuilder = createMdcFields();
-        builder.add("@mdc", mdcFieldsBuilder);
+        fieldsBuilderWithFields.add("@mdc", mdcFieldsBuilder);
 
-        return builder.build().toString() + "\n";
+        return fieldsBuilderWithFields.build().toString() + "\n";
 	}
 
 	private String createMessageWithoutFields(long millis) {
 		JsonObjectBuilder builder = Json.createBuilderFactory(null).createObjectBuilder();
         addCommonElements(millis, builder);
 
-        JsonObjectBuilder fieldsBuilder = Json.createBuilderFactory(null).createObjectBuilder();
-        addCommonFields(fieldsBuilder);
-
-        builder.add("@fields", fieldsBuilder);
+        addCommonFields(builder);
 
         JsonArrayBuilder tagsBuilder = Json.createArrayBuilder();
         tagsBuilder.add("foo");
@@ -191,19 +184,6 @@ public class LogstashUtilFormatterTest {
 
         String result = instance.format(record);
         assertEquals(fullLogMessage, result);
-    }
-
-    /**
-     * Test of encodeFields method, of class LogstashFormatter.
-     */
-    @Test
-    public void testEncodeFields() {
-    	System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.tags", "foo,bar");
-        System.setProperty("net.logstash.logging.formatter.LogstashUtilFormatter.fields", "foo:bar,baz:foobar");
-    	LogstashUtilFormatter instance = new LogstashUtilFormatter();
-
-        JsonObjectBuilder result = instance.encodeFields(record);
-        assertEquals(fieldsBuilderWithFields.build().toString(), result.build().toString());
     }
 
     /**
